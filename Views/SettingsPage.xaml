@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PortfelStudenta.ViewModels"
+             x:Class="PortfelStudenta.Views.SettingsPage"
+             x:DataType="viewmodels:SettingsViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center" />
+            <Border IsVisible="{Binding HasError}"
+                    BackgroundColor="#FFEBEE"
+                    Stroke="#EF5350"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="12">
+                <Label Text="{Binding ErrorMessage}" TextColor="#C62828" />
+            </Border>
+            <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="Transparent"
+                    Padding="16">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="📥 Import / Eksport" FontSize="18" FontAttributes="Bold" />
+                    <Button Text="📤 Eksportuj transakcje do CSV"
+                            Command="{Binding ExportToCsvCommand}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White" />
+                    <Button Text="📥 Importuj transakcje z CSV"
+                            Command="{Binding ImportFromCsvCommand}"
+                            BackgroundColor="#2196F3"
+                            TextColor="White" />
+                    <Border IsVisible="{Binding ShowImportResult}"
+                            BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B5E20}"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="Transparent"
+                            Padding="12">
+                        <Label Text="{Binding ImportResult}" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+            <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="Transparent"
+                    Padding="16">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="⚙ Zarządzanie danymi" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="Usuń wszystkie dane aplikacji. Ta operacja jest nieodwracalna."
+                           TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                           FontSize="12" />
+                    <Button Text="Wyczyść wszystkie dane"
+                            Command="{Binding ClearAllDataCommand}"
+                            BackgroundColor="#F44336"
+                            TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+            <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="Transparent"
+                    Padding="16">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="ℹ️ Źródła danych" FontSize="18" FontAttributes="Bold" />
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Kursy walut: NBP API" />
+                        <Label Text="Kryptowaluty: Binance API" />
+                        <Label Text="Akcje: Yahoo Finance API" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

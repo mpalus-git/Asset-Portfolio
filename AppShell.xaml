@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="PortfelStudenta.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:PortfelStudenta.Views"
+    Title="Portfel Studenta"
+    Shell.FlyoutBehavior="Disabled">
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TabBar">
+                <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Light=#2196F3, Dark=#64B5F6}" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light=#999999, Dark=#666666}" />
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
+    <TabBar>
+        <ShellContent
+            Title="Dashboard"
+            Icon="dashboard.png"
+            ContentTemplate="{DataTemplate views:DashboardPage}"
+            Route="DashboardPage" />
+        <ShellContent
+            Title="Rynki"
+            Icon="markets.png"
+            ContentTemplate="{DataTemplate views:MarketsPage}"
+            Route="MarketsPage" />
+        <ShellContent
+            Title="Portfel"
+            Icon="portfolio.png"
+            ContentTemplate="{DataTemplate views:PortfolioPage}"
+            Route="PortfolioPage" />
+        <ShellContent
+            Title="Ustawienia"
+            Icon="settings.png"
+            ContentTemplate="{DataTemplate views:SettingsPage}"
+            Route="SettingsPage" />
+    </TabBar>
+</Shell>

@@ -1,0 +1,31 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PortfelStudenta"
+             xmlns:converters="clr-namespace:PortfelStudenta.Converters"
+             x:Class="PortfelStudenta.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:PnLColorConverter x:Key="PnLColorConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:SelectedIndexConverter x:Key="SelectedIndexConverter" />
+            <converters:IndexToBoolConverter x:Key="IndexToBoolConverter" />
+            <converters:StockSymbolConverter x:Key="StockSymbolConverter" />
+            <converters:TransactionTypeColorConverter x:Key="TransactionTypeColorConverter" />
+            <converters:TransactionTypeIconConverter x:Key="TransactionTypeIconConverter" />
+            <converters:ActiveOpacityConverter x:Key="ActiveOpacityConverter" />
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
+            <converters:BoolToMoreLessConverter x:Key="BoolToMoreLessConverter" />
+            <converters:BoolToAdvancedViewTextConverter x:Key="BoolToAdvancedViewTextConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:IntervalToColorConverter x:Key="IntervalToColorConverter" />
+            <converters:StockIntervalToColorConverter x:Key="StockIntervalToColorConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

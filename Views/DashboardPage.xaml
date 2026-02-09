@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PortfelStudenta.ViewModels"
+             xmlns:models="clr-namespace:PortfelStudenta.Models"
+             xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             x:Class="PortfelStudenta.Views.DashboardPage"
+             x:DataType="viewmodels:DashboardViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+    <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" />
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="#FFEBEE"
+                        Stroke="#EF5350"
+                        StrokeShape="RoundRectangle 5"
+                        Padding="12">
+                    <Label Text="{Binding ErrorMessage}" TextColor="#C62828" />
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Wartość portfela"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                        <Label Text="{Binding PortfolioSummary.TotalValue, StringFormat='{0:N2} PLN'}"
+                               FontSize="32"
+                               FontAttributes="Bold" />
+                        <BoxView HeightRequest="1" Color="#E0E0E0" Margin="0,8" />
+                        <Grid ColumnDefinitions="*,*">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Dzienny P&amp;L" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding PortfolioSummary.DailyPnL, StringFormat='{0:N2} PLN'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding PortfolioSummary.DailyPnL, Converter={StaticResource PnLColorConverter}}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Całkowity P&amp;L" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding PortfolioSummary.TotalNetPnL, StringFormat='{0:N2} PLN'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding PortfolioSummary.TotalNetPnL, Converter={StaticResource PnLColorConverter}}" />
+                                <Label Text="{Binding PortfolioSummary.TotalPnLPercent, StringFormat='({0:N2}%)'}"
+                                       FontSize="12"
+                                       TextColor="{Binding PortfolioSummary.TotalPnLPercent, Converter={StaticResource PnLColorConverter}}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+                <Border IsVisible="{Binding HasPositions, Converter={StaticResource InvertedBoolConverter}}"
+                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="24">
+                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <Label Text="📊" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Brak pozycji w portfelu"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                        <Label Text="Dodaj pierwszą transakcję, aby zobaczyć statystyki"
+                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16"
+                        IsVisible="{Binding HasPositions}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Wartość portfela" FontSize="16" FontAttributes="Bold" />
+                        <microcharts:ChartView Chart="{Binding PortfolioValueChart}"
+                                               HeightRequest="200" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="📊 Statystyki" FontSize="18" FontAttributes="Bold" />
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                            <VerticalStackLayout>
+                                <Label Text="Transakcje" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding TransactionCount}" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="% Zwrotu" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding PortfolioSummary.TotalPnLPercent, StringFormat='{0:N2}%'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding PortfolioSummary.TotalPnLPercent, Converter={StaticResource PnLColorConverter}}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2">
+                                <Label Text="Liczba pozycji" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding PortfolioSummary.Positions.Count}" FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16"
+                        IsVisible="{Binding HasPositions}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Alokacja aktywów" FontSize="16" FontAttributes="Bold" />
+                        <microcharts:ChartView Chart="{Binding AllocationChart}"
+                                               HeightRequest="200" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16"
+                        IsVisible="{Binding HasPositions}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="📈 Największe zyski" FontSize="16" FontAttributes="Bold" />
+                        <CollectionView ItemsSource="{Binding TopGainers}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:PortfolioPosition">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Symbol}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Name}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                            <Label Text="{Binding NetPnL, StringFormat='+{0:N2} PLN'}"
+                                                   TextColor="#4CAF50"
+                                                   FontAttributes="Bold" />
+                                            <Label Text="{Binding PnLPercent, StringFormat='+{0:N2}%'}"
+                                                   TextColor="#4CAF50"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16"
+                        IsVisible="{Binding HasPositions}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="📉 Największe straty" FontSize="16" FontAttributes="Bold" />
+                        <CollectionView ItemsSource="{Binding TopLosers}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:PortfolioPosition">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Symbol}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Name}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                            <Label Text="{Binding NetPnL, StringFormat='{0:N2} PLN'}"
+                                                   TextColor="#F44336"
+                                                   FontAttributes="Bold" />
+                                            <Label Text="{Binding PnLPercent, StringFormat='{0:N2}%'}"
+                                                   TextColor="#F44336"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

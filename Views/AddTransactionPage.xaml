@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PortfelStudenta.ViewModels"
+             x:Class="PortfelStudenta.Views.AddTransactionPage"
+             x:DataType="viewmodels:AddTransactionViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" />
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="#FFEBEE"
+                        Stroke="#EF5350"
+                        StrokeShape="RoundRectangle 5"
+                        Padding="12">
+                    <Label Text="{Binding ErrorMessage}" TextColor="#C62828" />
+                </Border>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Typ aktywa" FontAttributes="Bold" />
+                    <Picker ItemsSource="{Binding AssetTypes}"
+                            SelectedIndex="{Binding SelectedAssetTypeIndex}"
+                            Title="Wybierz typ" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Typ transakcji" FontAttributes="Bold" />
+                    <HorizontalStackLayout Spacing="16">
+                        <RadioButton Content="Kupno"
+                                     IsChecked="{Binding SelectedTransactionTypeIndex, Converter={StaticResource IndexToBoolConverter}, ConverterParameter=0}"
+                                     GroupName="TransactionType" />
+                        <RadioButton Content="Sprzedaż"
+                                     IsChecked="{Binding SelectedTransactionTypeIndex, Converter={StaticResource IndexToBoolConverter}, ConverterParameter=1}"
+                                     GroupName="TransactionType" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Popularne aktywa" FontAttributes="Bold" />
+                    <FlexLayout Wrap="Wrap" JustifyContent="Start" BindableLayout.ItemsSource="{Binding SuggestedAssets}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Button Text="{Binding .}"
+                                        Margin="4"
+                                        Padding="12,8"
+                                        FontSize="12"
+                                        BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#424242}"
+                                        TextColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AddTransactionViewModel}}, Path=SelectAssetCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Symbol *" FontAttributes="Bold" />
+                    <Entry Text="{Binding Symbol}"
+                           Placeholder="np. BTC, AAPL, EUR" />
+                    <Label Text="{Binding SymbolError}"
+                           TextColor="#F44336"
+                           FontSize="12"
+                           IsVisible="{Binding SymbolError, Converter={StaticResource StringToBoolConverter}}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Nazwa" FontAttributes="Bold" />
+                    <Entry Text="{Binding Name}"
+                           Placeholder="np. Bitcoin, Apple Inc." />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Ilość *" FontAttributes="Bold" />
+                    <Entry Text="{Binding QuantityText}"
+                           Placeholder="0.00"
+                           Keyboard="Numeric" />
+                    <Label Text="{Binding QuantityError}"
+                           TextColor="#F44336"
+                           FontSize="12"
+                           IsVisible="{Binding QuantityError, Converter={StaticResource StringToBoolConverter}}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Cena jednostkowa (PLN) *" FontAttributes="Bold" />
+                        <Button Grid.Column="1"
+                                Text="Pobierz cenę"
+                                Command="{Binding FetchCurrentPriceCommand}"
+                                FontSize="12"
+                                Padding="8,4"
+                                BackgroundColor="#2196F3"
+                                TextColor="White" />
+                    </Grid>
+                    <Entry Text="{Binding UnitPriceText}"
+                           Placeholder="0.00"
+                           Keyboard="Numeric" />
+                    <Label Text="{Binding PriceError}"
+                           TextColor="#F44336"
+                           FontSize="12"
+                           IsVisible="{Binding PriceError, Converter={StaticResource StringToBoolConverter}}" />
+                </VerticalStackLayout>
+                <Border BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#1565C0}"
+                        StrokeShape="RoundRectangle 8"
+                        Stroke="Transparent"
+                        Padding="12">
+                    <HorizontalStackLayout>
+                        <Label Text="Wartość transakcji: " />
+                        <Label Text="{Binding TotalValue, StringFormat='{0:N2} PLN'}" FontAttributes="Bold" />
+                    </HorizontalStackLayout>
+                </Border>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Prowizja" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="2*,*" ColumnSpacing="8">
+                        <Entry Text="{Binding CommissionText}"
+                               Placeholder="0.00"
+                               Keyboard="Numeric" />
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding Currencies}"
+                                SelectedItem="{Binding CommissionCurrency}" />
+                    </Grid>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Data transakcji" FontAttributes="Bold" />
+                    <DatePicker Date="{Binding TransactionDate}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Notatki" FontAttributes="Bold" />
+                    <Editor Text="{Binding Notes}"
+                            Placeholder="Opcjonalne notatki..."
+                            HeightRequest="80" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="16"
+              Padding="16"
+              BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
+            <Button Text="Anuluj"
+                    Command="{Binding CancelCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#424242}"
+                    TextColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}" />
+            <Button Grid.Column="1"
+                    Text="Zapisz"
+                    Command="{Binding SaveTransactionCommand}"
+                    IsEnabled="{Binding CanSave}"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White" />
+        </Grid>
+    </Grid>
+</ContentPage>

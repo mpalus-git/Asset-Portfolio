@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PortfelStudenta.ViewModels"
+             xmlns:models="clr-namespace:PortfelStudenta.Models"
+             x:Class="PortfelStudenta.Views.PortfolioPage"
+             x:DataType="viewmodels:PortfolioViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="*,Auto">
+        <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <ScrollView>
+                <VerticalStackLayout Padding="16" Spacing="16">
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       HorizontalOptions="Center" />
+                    <Border IsVisible="{Binding HasError}"
+                            BackgroundColor="#FFEBEE"
+                            Stroke="#EF5350"
+                            StrokeShape="RoundRectangle 5"
+                            Padding="12">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#C62828" />
+                    </Border>
+                    <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="Transparent"
+                            Padding="16">
+                        <Border.Shadow>
+                            <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                        </Border.Shadow>
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="12">
+                            <VerticalStackLayout>
+                                <Label Text="Wartość portfela" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding Summary.TotalValue, StringFormat='{0:N2} PLN'}"
+                                       FontSize="24" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="P&amp;L netto" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding Summary.TotalNetPnL, StringFormat='{0:N2} PLN'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding Summary.TotalNetPnL, Converter={StaticResource PnLColorConverter}}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Row="1">
+                                <Label Text="Koszt zakupu" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding Summary.TotalCost, StringFormat='{0:N2} PLN'}" FontSize="16" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                                <Label Text="Suma prowizji" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                <Label Text="{Binding Summary.TotalCommission, StringFormat='{0:N2} PLN'}" FontSize="16" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                    <Border IsVisible="{Binding HasPositions, Converter={StaticResource InvertedBoolConverter}}"
+                            BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="Transparent"
+                            Padding="24">
+                        <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                            <Label Text="📊" FontSize="48" HorizontalOptions="Center" />
+                            <Label Text="Portfel jest pusty"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Dodaj pierwszą transakcję"
+                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Label Text="Pozycje"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           IsVisible="{Binding HasPositions}" />
+                    <CollectionView ItemsSource="{Binding Positions}"
+                                    IsVisible="{Binding HasPositions}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:PortfolioPosition">
+                                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="Transparent"
+                                        Padding="16"
+                                        Margin="0,4">
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                                    </Border.Shadow>
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Symbol}" FontSize="18" FontAttributes="Bold" />
+                                            <Label Text="{Binding Name}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                            <Label Text="{Binding CurrentValue, StringFormat='{0:N2} PLN'}"
+                                                   FontSize="18"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="End" />
+                                            <Label Text="{Binding NetPnL, StringFormat='{0:N2} PLN'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End"
+                                                   TextColor="{Binding NetPnL, Converter={StaticResource PnLColorConverter}}" />
+                                        </VerticalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="1" Spacing="16">
+                                            <Label Text="{Binding Quantity, StringFormat='Ilość: {0:N4}'}"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            <Label Text="{Binding AveragePrice, StringFormat='Śr. cena: {0:N2}'}"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </HorizontalStackLayout>
+                                        <Label Grid.Row="1" Grid.Column="1"
+                                               Text="{Binding PnLPercent, StringFormat='({0:N2}%)'}"
+                                               HorizontalOptions="End"
+                                               TextColor="{Binding PnLPercent, Converter={StaticResource PnLColorConverter}}" />
+                                        <Label Grid.Row="2"
+                                               Text="{Binding CurrentPrice, StringFormat='Akt. cena: {0:N2} PLN'}"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        <Label Grid.Row="2" Grid.Column="1"
+                                               Text="{Binding TotalCommission, StringFormat='Prowizje: {0:N2} PLN'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                               HorizontalOptions="End" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Label Text="Transakcje sprzedaży"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           IsVisible="{Binding ShowBuyTransactions, Converter={StaticResource InvertedBoolConverter}}"
+                           Margin="0,16,0,8" />
+                    <CollectionView ItemsSource="{Binding FilteredTransactions}"
+                                    IsVisible="{Binding ShowBuyTransactions, Converter={StaticResource InvertedBoolConverter}}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Transaction">
+                                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="Transparent"
+                                        Padding="16"
+                                        Margin="0,4">
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                                    </Border.Shadow>
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Symbol}" FontSize="16" FontAttributes="Bold" />
+                                            <Label Text="{Binding Name}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                            <Label Text="{Binding TotalValue, StringFormat='{0:N2} PLN'}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="End" />
+                                            <Label Text="{Binding Date, StringFormat='{0:dd.MM.yyyy}'}"
+                                                   FontSize="11"
+                                                   HorizontalOptions="End"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="1" Spacing="16">
+                                            <Label Text="{Binding Quantity, StringFormat='Ilość: {0:N4}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            <Label Text="{Binding UnitPrice, StringFormat='Cena: {0:N2}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </HorizontalStackLayout>
+                                        <Label Grid.Row="1" Grid.Column="1"
+                                               Text="{Binding Commission, StringFormat='Prowizja: {0:N2} PLN'}"
+                                               FontSize="11"
+                                               HorizontalOptions="End"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Text="Wszystkie transakcje"
+                            Command="{Binding ShowAllPositionsCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#1E3A5F}"
+                            TextColor="{AppThemeBinding Light=#1976D2, Dark=#64B5F6}"
+                            CornerRadius="8"
+                            HeightRequest="45"
+                            FontAttributes="Bold"
+                            Margin="0,8">
+                        <Button.Triggers>
+                            <MultiTrigger TargetType="Button">
+                                <MultiTrigger.Conditions>
+                                    <BindingCondition Binding="{Binding HasMorePositions}" Value="True" />
+                                    <BindingCondition Binding="{Binding ShowingAllPositions}" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter Property="IsVisible" Value="True" />
+                            </MultiTrigger>
+                        </Button.Triggers>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="IsVisible" Value="False" />
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Label Text="Starsze pozycje"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           IsVisible="{Binding ShowingAllPositions}"
+                           Margin="0,8,0,0" />
+                    <CollectionView ItemsSource="{Binding RemainingPositions}"
+                                    IsVisible="{Binding ShowingAllPositions}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:PortfolioPosition">
+                                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="Transparent"
+                                        Padding="16"
+                                        Margin="0,4">
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                                    </Border.Shadow>
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Symbol}" FontSize="18" FontAttributes="Bold" />
+                                            <Label Text="{Binding Name}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                            <Label Text="{Binding CurrentValue, StringFormat='{0:N2} PLN'}"
+                                                   FontSize="18"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="End" />
+                                            <Label Text="{Binding NetPnL, StringFormat='{0:N2} PLN'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End"
+                                                   TextColor="{Binding NetPnL, Converter={StaticResource PnLColorConverter}}" />
+                                        </VerticalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="1" Spacing="16">
+                                            <Label Text="{Binding Quantity, StringFormat='Ilość: {0:N4}'}"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            <Label Text="{Binding AveragePrice, StringFormat='Śr. cena: {0:N2}'}"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </HorizontalStackLayout>
+                                        <Label Grid.Row="1" Grid.Column="1"
+                                               Text="{Binding PnLPercent, StringFormat='({0:N2}%)'}"
+                                               HorizontalOptions="End"
+                                               TextColor="{Binding PnLPercent, Converter={StaticResource PnLColorConverter}}" />
+                                        <Label Grid.Row="2"
+                                               Text="{Binding CurrentPrice, StringFormat='Akt. cena: {0:N2} PLN'}"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        <Label Grid.Row="2" Grid.Column="1"
+                                               Text="{Binding TotalCommission, StringFormat='Prowizje: {0:N2} PLN'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                               HorizontalOptions="End" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <BoxView HeightRequest="80" Color="Transparent" />
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="16">
+            <Button Text="{Binding TransactionTypeLabel}"
+                    Command="{Binding ToggleTransactionTypeCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B5E20}"
+                    TextColor="{AppThemeBinding Light=#2E7D32, Dark=#81C784}"
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    FontAttributes="Bold"
+                    Padding="20,0"
+                    HorizontalOptions="Start" />
+            <Button Grid.Column="2"
+                    Text="+ Dodaj transakcję"
+                    Command="{Binding AddTransactionCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    FontAttributes="Bold"
+                    HorizontalOptions="End" />
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,1255 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PortfelStudenta.ViewModels"
+             xmlns:models="clr-namespace:PortfelStudenta.Models"
+             xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             x:Class="PortfelStudenta.Views.MarketsPage"
+             x:DataType="viewmodels:MarketsViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+    <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <HorizontalStackLayout Spacing="8">
+                                <Image Source="logonbpw4k.jpg"
+                                       WidthRequest="24"
+                                       HeightRequest="24"
+                                       Aspect="AspectFit"
+                                       VerticalOptions="Center" />
+                                <Label Text="Kursy walut NBP" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <ActivityIndicator Grid.Column="1"
+                                               IsRunning="{Binding IsCurrenciesLoading}"
+                                               IsVisible="{Binding IsCurrenciesLoading}"
+                                               HeightRequest="20" WidthRequest="20" />
+                        </Grid>
+                        <Label Text="{Binding CurrenciesError}"
+                               TextColor="#F44336"
+                               IsVisible="{Binding CurrenciesError, Converter={StaticResource StringToBoolConverter}}"
+                               FontSize="12" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Currencies}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:AssetPrice">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,8" ColumnSpacing="12">
+                                        <Border BackgroundColor="#2196F3"
+                                                StrokeShape="RoundRectangle 20"
+                                                Stroke="Transparent"
+                                                WidthRequest="40" HeightRequest="40">
+                                            <Label Text="{Binding Symbol}"
+                                                   TextColor="White"
+                                                   FontAttributes="Bold"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2"
+                                               Text="{Binding PricePln, StringFormat='{0:N4} PLN'}"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding SelectedCurrencies}"
+                                        IsVisible="{Binding SelectedCurrencies.Count, Converter={StaticResource IntToBoolConverter}}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:AssetPrice">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,8" ColumnSpacing="12">
+                                        <Border BackgroundColor="#2196F3"
+                                                StrokeShape="RoundRectangle 20"
+                                                Stroke="Transparent"
+                                                WidthRequest="40" HeightRequest="40">
+                                            <Label Text="{Binding Symbol}"
+                                                   TextColor="White"
+                                                   FontAttributes="Bold"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2"
+                                               Text="{Binding PricePln, StringFormat='{0:N4} PLN'}"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Button Text="{Binding IsMoreCurrenciesExpanded, Converter={StaticResource BoolToMoreLessConverter}}"
+                                Command="{Binding ToggleMoreCurrenciesCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="#2196F3"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Start"
+                                Padding="0"
+                                Margin="0,4,0,0" />
+                        <Border IsVisible="{Binding IsMoreCurrenciesExpanded}"
+                                BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="8"
+                                Margin="0,4,0,0">
+                            <VerticalStackLayout Spacing="4">
+                                <ActivityIndicator IsRunning="{Binding IsMoreCurrenciesLoading}"
+                                                   IsVisible="{Binding IsMoreCurrenciesLoading}"
+                                                   HeightRequest="24" WidthRequest="24"
+                                                   HorizontalOptions="Center" />
+                                <CollectionView ItemsSource="{Binding AdditionalCurrencies}"
+                                                MaximumHeightRequest="300">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AssetPrice">
+                                            <Border BackgroundColor="Transparent"
+                                                    StrokeShape="RoundRectangle 4"
+                                                    Stroke="Transparent"
+                                                    Padding="8,6">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MarketsViewModel}}, Path=SelectAdditionalCurrencyCommand}"
+                                                                          CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                                    <Border BackgroundColor="#2196F3"
+                                                            StrokeShape="RoundRectangle 14"
+                                                            Stroke="Transparent"
+                                                            WidthRequest="28" HeightRequest="28">
+                                                        <Label Text="{Binding Symbol}"
+                                                               TextColor="White"
+                                                               FontAttributes="Bold"
+                                                               FontSize="9"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center" />
+                                                    </Border>
+                                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                        <Label Text="{Binding Name}" FontSize="13" />
+                                                        <Label Text="{Binding Symbol}" FontSize="10" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                    </VerticalStackLayout>
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding PricePln, StringFormat='{0:N4} PLN'}"
+                                                           FontSize="12"
+                                                           VerticalOptions="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </VerticalStackLayout>
+                        </Border>
+                        <BoxView HeightRequest="1"
+                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                 Margin="0,8,0,8" />
+                        <Label Text="Konwerter walut" FontSize="14" FontAttributes="Bold" />
+                        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="8" RowDefinitions="Auto,Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Border BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                        Padding="8">
+                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="4">
+                                        <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#3D3D3D}"
+                                                StrokeShape="RoundRectangle 6"
+                                                Stroke="Transparent"
+                                                Padding="8,4">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleFromPickerCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Border BackgroundColor="#2196F3"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        Stroke="Transparent"
+                                                        WidthRequest="20" HeightRequest="20">
+                                                    <Label Text="{Binding ConverterFromCurrency.Symbol}"
+                                                           TextColor="White"
+                                                           FontAttributes="Bold"
+                                                           FontSize="8"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding ConverterFromCurrency.Symbol, FallbackValue='Wybierz'}"
+                                                       VerticalOptions="Center"
+                                                       FontAttributes="Bold" />
+                                                <Label Text="v"
+                                                       VerticalOptions="Center"
+                                                       TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                        <Entry Grid.Row="1"
+                                               Text="{Binding ConverterFromAmount}"
+                                               Placeholder="0,00"
+                                               Keyboard="Numeric"
+                                               FontSize="16"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+                                </Border>
+                                <Border IsVisible="{Binding IsConverterFromPickerVisible}"
+                                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                        Padding="4"
+                                        MaximumHeightRequest="200">
+                                    <CollectionView ItemsSource="{Binding ConverterCurrencies}">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:AssetPrice">
+                                                <Border BackgroundColor="Transparent"
+                                                        StrokeShape="RoundRectangle 4"
+                                                        Stroke="Transparent"
+                                                        Padding="8,6">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MarketsViewModel}}, Path=SelectFromCurrencyCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                                        <Border BackgroundColor="#2196F3"
+                                                                StrokeShape="RoundRectangle 10"
+                                                                Stroke="Transparent"
+                                                                WidthRequest="20" HeightRequest="20">
+                                                            <Label Text="{Binding Symbol}"
+                                                                   TextColor="White"
+                                                                   FontSize="7"
+                                                                   HorizontalOptions="Center"
+                                                                   VerticalOptions="Center" />
+                                                        </Border>
+                                                        <Label Grid.Column="1" Text="{Binding Symbol}" VerticalOptions="Center" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="&lt;-&gt;"
+                                    Command="{Binding SwapCurrenciesCommand}"
+                                    BackgroundColor="#2196F3"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    WidthRequest="44"
+                                    HeightRequest="44"
+                                    CornerRadius="22"
+                                    VerticalOptions="Center"
+                                    Padding="0" />
+                            <VerticalStackLayout Grid.Column="2" Spacing="4">
+                                <Border BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                        Padding="8">
+                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="4">
+                                        <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#3D3D3D}"
+                                                StrokeShape="RoundRectangle 6"
+                                                Stroke="Transparent"
+                                                Padding="8,4">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleToPickerCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Border BackgroundColor="#2196F3"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        Stroke="Transparent"
+                                                        WidthRequest="20" HeightRequest="20"
+                                                        IsVisible="{Binding ConverterToCurrency, Converter={StaticResource NullToBoolConverter}}">
+                                                    <Label Text="{Binding ConverterToCurrency.Symbol}"
+                                                           TextColor="White"
+                                                           FontAttributes="Bold"
+                                                           FontSize="8"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding ConverterToCurrency.Symbol, FallbackValue='Wybierz'}"
+                                                       VerticalOptions="Center"
+                                                       FontAttributes="Bold" />
+                                                <Label Text="v"
+                                                       VerticalOptions="Center"
+                                                       TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                        <Label Grid.Row="1"
+                                               Text="{Binding ConverterToAmount, FallbackValue=&apos;-&apos;}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               Padding="0,8" />
+                                    </Grid>
+                                </Border>
+                                <Border IsVisible="{Binding IsConverterToPickerVisible}"
+                                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                        Padding="4"
+                                        MaximumHeightRequest="200">
+                                    <CollectionView ItemsSource="{Binding ConverterCurrencies}">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:AssetPrice">
+                                                <Grid Padding="8,6" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                                    <Grid.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MarketsViewModel}}, Path=SelectToCurrencyCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Grid.GestureRecognizers>
+                                                    <Border BackgroundColor="#2196F3"
+                                                            StrokeShape="RoundRectangle 10"
+                                                            Stroke="Transparent"
+                                                            WidthRequest="20" HeightRequest="20">
+                                                        <Label Text="{Binding Symbol}"
+                                                               TextColor="White"
+                                                               FontSize="7"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center" />
+                                                    </Border>
+                                                    <Label Grid.Column="1" Text="{Binding Symbol}" VerticalOptions="Center" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <HorizontalStackLayout Spacing="8">
+                                <Image Source="binancelogo6219389_1280.webp"
+                                       WidthRequest="24"
+                                       HeightRequest="24"
+                                       Aspect="AspectFit"
+                                       VerticalOptions="Center" />
+                                <Label Text="Kryptowaluty" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="{Binding IsAdvancedViewEnabled, Converter={StaticResource BoolToAdvancedViewTextConverter}}"
+                                    Command="{Binding ToggleAdvancedViewCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#FF9800"
+                                    FontSize="12"
+                                    HorizontalOptions="End"
+                                    Padding="8,4" />
+                            <ActivityIndicator Grid.Column="2"
+                                               IsRunning="{Binding IsCryptosLoading}"
+                                               IsVisible="{Binding IsCryptosLoading}"
+                                               HeightRequest="20" WidthRequest="20" />
+                        </Grid>
+                        <Label Text="{Binding CryptosError}"
+                               TextColor="#F44336"
+                               IsVisible="{Binding CryptosError, Converter={StaticResource StringToBoolConverter}}"
+                               FontSize="12" />
+                        <CollectionView ItemsSource="{Binding Cryptos}"
+                                        IsVisible="{Binding IsAdvancedViewEnabled, Converter={StaticResource InverseBoolConverter}}"
+                                        HeightRequest="{OnPlatform Android=400, Default=-1}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:AssetPrice">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,8" ColumnSpacing="12">
+                                        <Border BackgroundColor="#FF9800"
+                                                StrokeShape="RoundRectangle 20"
+                                                Stroke="Transparent"
+                                                WidthRequest="40" HeightRequest="40">
+                                            <Label Text="{Binding Symbol}"
+                                                   TextColor="White"
+                                                   FontAttributes="Bold"
+                                                   FontSize="10"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                            <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="End" />
+                                            <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End"
+                                                   TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <CollectionView ItemsSource="{Binding Cryptos}"
+                                        IsVisible="{Binding IsAdvancedViewEnabled}"
+                                        SelectionMode="Single"
+                                        SelectedItem="{Binding SelectedCryptoForChart}"
+                                        SelectionChangedCommand="{Binding SelectCryptoForChartCommand}"
+                                        SelectionChangedCommandParameter="{Binding SelectedCryptoForChart}"
+                                        HeightRequest="{OnPlatform Android=400, Default=-1}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:AssetPrice">
+                                    <Border BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                            StrokeShape="RoundRectangle 8"
+                                            Stroke="Transparent"
+                                            Padding="12"
+                                            Margin="0,4">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup Name="CommonStates">
+                                                <VisualState Name="Normal">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="Stroke" Value="Transparent" />
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState Name="Selected">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="Stroke" Value="#FF9800" />
+                                                        <Setter Property="StrokeThickness" Value="2" />
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFF8E1, Dark=#3D3525}" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <VerticalStackLayout Spacing="8">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                                <Border BackgroundColor="#FF9800"
+                                                        StrokeShape="RoundRectangle 20"
+                                                        Stroke="Transparent"
+                                                        WidthRequest="40" HeightRequest="40">
+                                                    <Label Text="{Binding Symbol}"
+                                                           TextColor="White"
+                                                           FontAttributes="Bold"
+                                                           FontSize="10"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                    <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                                    <Label Text="{Binding Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                                    <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                           FontAttributes="Bold"
+                                                           HorizontalOptions="End" />
+                                                    <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                           FontSize="12"
+                                                           HorizontalOptions="End"
+                                                           TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="4">
+                                                <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
+                                                    <Label Text="Najwyższa cena 24h:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding HighPrice24h, StringFormat='${0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#4CAF50" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                                    <Label Text="Najniższa cena 24h:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding LowPrice24h, StringFormat='${0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#F44336" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="4">
+                                                    <Label Text="Wolumen:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding Volume24h, StringFormat='{0:N0}'}" FontSize="11" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="4">
+                                                    <Label Text="Wartość:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding QuoteVolume24h, StringFormat='${0:N0}'}" FontSize="11" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="4">
+                                                    <Label Text="Zmiana:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding PriceChange24h, StringFormat='${0:N2}'}" FontSize="11"
+                                                           TextColor="{Binding PriceChange24h, Converter={StaticResource PnLColorConverter}}" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Spacing="4">
+                                                    <Label Text="Transakcje:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                                    <Label Text="{Binding TradeCount, StringFormat='{0:N0}'}" FontSize="11" />
+                                                </HorizontalStackLayout>
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Border IsVisible="{Binding IsAdvancedViewEnabled}"
+                                BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="12"
+                                Margin="0,8,0,0">
+                            <VerticalStackLayout Spacing="12">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding SelectedCryptoForChart.Name, StringFormat='Wykres: {0}'}"
+                                           FontSize="14" FontAttributes="Bold"
+                                           IsVisible="{Binding SelectedCryptoForChart, Converter={StaticResource NullToBoolConverter}}" />
+                                    <Label Text="{Binding SelectedChartInterval, StringFormat='({0})'}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <ActivityIndicator IsRunning="{Binding IsChartLoading}"
+                                                   IsVisible="{Binding IsChartLoading}"
+                                                   HeightRequest="30" WidthRequest="30"
+                                                   HorizontalOptions="Center" />
+                                <ContentView>
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          RowDefinitions="*,Auto">
+                                        <Grid Grid.Column="0" Grid.Row="0"
+                                              RowDefinitions="Auto,*,Auto"
+                                              Margin="0,0,6,0">
+                                            <Label Grid.Row="0"
+                                                   Text="{Binding ChartMaxPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Start" />
+                                            <Label Grid.Row="1"
+                                                   Text="{Binding ChartMidPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Row="2"
+                                                   Text="{Binding ChartMinPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="End" />
+                                        </Grid>
+                                        <microcharts:ChartView Grid.Column="1" Grid.Row="0"
+                                                               Chart="{Binding CryptoChart}"
+                                                               HeightRequest="200"
+                                                               HorizontalOptions="Fill" />
+                                        <Grid Grid.Column="1" Grid.Row="1"
+                                              ColumnDefinitions="*,*,*"
+                                              Margin="0,4,0,0">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding ChartStartDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Start" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding ChartMidDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Center" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding ChartEndDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="End" />
+                                        </Grid>
+                                    </Grid>
+                                </ContentView>
+                                <HorizontalStackLayout Spacing="16"
+                                                       HorizontalOptions="Center"
+                                                       Margin="0,8,0,0">
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📈" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś Y: Cena (USD)"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📅" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś X: Data (dd.mm)"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                    <Button Text="24h"
+                                            Command="{Binding ChangeChartIntervalCommand}"
+                                            CommandParameter="24h"
+                                            BackgroundColor="{Binding SelectedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=24h}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1tyd."
+                                            Command="{Binding ChangeChartIntervalCommand}"
+                                            CommandParameter="1tyd."
+                                            BackgroundColor="{Binding SelectedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1tyd.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1msc."
+                                            Command="{Binding ChangeChartIntervalCommand}"
+                                            CommandParameter="1msc."
+                                            BackgroundColor="{Binding SelectedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1msc.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1rok"
+                                            Command="{Binding ChangeChartIntervalCommand}"
+                                            CommandParameter="1rok"
+                                            BackgroundColor="{Binding SelectedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1rok}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                        <BoxView HeightRequest="1"
+                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                 Margin="0,8,0,8" />
+                        <Label Text="Szukaj kryptowaluty" FontSize="14" FontAttributes="Bold" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Border BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                    Padding="12,8">
+                                <Entry Text="{Binding CryptoSearchQuery}"
+                                       Placeholder="Wpisz symbol (np. BTC, ETH, DOGE)"
+                                       FontSize="14" />
+                            </Border>
+                            <Button Grid.Column="1"
+                                    Text="Szukaj"
+                                    Command="{Binding SearchCryptoCommand}"
+                                    BackgroundColor="#FF9800"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="8"
+                                    Padding="16,8" />
+                        </Grid>
+                        <ActivityIndicator IsRunning="{Binding IsCryptoSearching}"
+                                           IsVisible="{Binding IsCryptoSearching}"
+                                           HeightRequest="24" WidthRequest="24"
+                                           HorizontalOptions="Center" />
+                        <Border IsVisible="{Binding SearchedCrypto, Converter={StaticResource NullToBoolConverter}}"
+                                BackgroundColor="{AppThemeBinding Light=#FFF3E0, Dark=#3D3020}"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="#FF9800"
+                                Padding="12">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border BackgroundColor="#FF9800"
+                                            StrokeShape="RoundRectangle 20"
+                                            Stroke="Transparent"
+                                            WidthRequest="40" HeightRequest="40">
+                                        <Label Text="{Binding SearchedCrypto.Symbol}"
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               FontSize="10"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding SearchedCrypto.Name}" FontAttributes="Bold" />
+                                        <Label Text="{Binding SearchedCrypto.Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                        <Label Text="{Binding SearchedCrypto.PricePln, StringFormat='{0:N2} PLN'}"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="End" />
+                                        <Label Text="{Binding SearchedCrypto.ChangePercent24h, StringFormat='{0:N2}%'}"
+                                               FontSize="12"
+                                               HorizontalOptions="End"
+                                               TextColor="{Binding SearchedCrypto.ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="4">
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
+                                        <Label Text="Najwyższa cena (dziś):" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.HighPrice24h, StringFormat='${0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#4CAF50" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                        <Label Text="Najniższa cena (dziś):" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.LowPrice24h, StringFormat='${0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#F44336" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="4">
+                                        <Label Text="Max 52 tyg.:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.FiftyTwoWeekHigh, StringFormat='${0:N2}'}" FontSize="11" TextColor="#4CAF50" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="4">
+                                        <Label Text="Min 52 tyg.:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.FiftyTwoWeekLow, StringFormat='${0:N2}'}" FontSize="11" TextColor="#F44336" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="4">
+                                        <Label Text="Wolumen:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.Volume24h, StringFormat='{0:N0}'}" FontSize="11" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Spacing="4">
+                                        <Label Text="Zmiana:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedCrypto.PriceChange24h, StringFormat='${0:N2}'}" FontSize="11"
+                                               TextColor="{Binding SearchedCrypto.PriceChange24h, Converter={StaticResource PnLColorConverter}}" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                                <BoxView HeightRequest="1"
+                                         BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                         Margin="0,4,0,4" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding SearchedCrypto.Name, StringFormat='Wykres: {0}'}"
+                                           FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="{Binding SearchedChartInterval, StringFormat='({0})'}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <ActivityIndicator IsRunning="{Binding IsSearchedChartLoading}"
+                                                   IsVisible="{Binding IsSearchedChartLoading}"
+                                                   HeightRequest="30" WidthRequest="30"
+                                                   HorizontalOptions="Center" />
+                                <ContentView>
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          RowDefinitions="*,Auto">
+                                        <Grid Grid.Column="0" Grid.Row="0"
+                                              RowDefinitions="Auto,*,Auto"
+                                              Margin="0,0,6,0">
+                                            <Label Grid.Row="0"
+                                                   Text="{Binding SearchedChartMaxPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Start" />
+                                            <Label Grid.Row="1"
+                                                   Text="{Binding SearchedChartMidPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Row="2"
+                                                   Text="{Binding SearchedChartMinPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="End" />
+                                        </Grid>
+                                        <microcharts:ChartView Grid.Column="1" Grid.Row="0"
+                                                               Chart="{Binding SearchedCryptoChart}"
+                                                               HeightRequest="200"
+                                                               HorizontalOptions="Fill" />
+                                        <Grid Grid.Column="1" Grid.Row="1"
+                                              ColumnDefinitions="*,*,*"
+                                              Margin="0,4,0,0">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding SearchedChartStartDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Start" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding SearchedChartMidDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Center" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding SearchedChartEndDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="End" />
+                                        </Grid>
+                                    </Grid>
+                                </ContentView>
+                                <HorizontalStackLayout Spacing="16"
+                                                       HorizontalOptions="Center"
+                                                       Margin="0,8,0,0">
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📈" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś Y: Cena (USD)"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📅" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś X: Data (dd.mm)"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                    <Button Text="24h"
+                                            Command="{Binding ChangeSearchedChartIntervalCommand}"
+                                            CommandParameter="24h"
+                                            BackgroundColor="{Binding SearchedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=24h}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1tyd."
+                                            Command="{Binding ChangeSearchedChartIntervalCommand}"
+                                            CommandParameter="1tyd."
+                                            BackgroundColor="{Binding SearchedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1tyd.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1msc."
+                                            Command="{Binding ChangeSearchedChartIntervalCommand}"
+                                            CommandParameter="1msc."
+                                            BackgroundColor="{Binding SearchedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1msc.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1rok"
+                                            Command="{Binding ChangeSearchedChartIntervalCommand}"
+                                            CommandParameter="1rok"
+                                            BackgroundColor="{Binding SearchedChartInterval, Converter={StaticResource IntervalToColorConverter}, ConverterParameter=1rok}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="Transparent"
+                        Padding="16">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.2" Radius="8" Offset="0,2" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="📈 Akcje" FontSize="18" FontAttributes="Bold" />
+                            <ActivityIndicator Grid.Column="1"
+                                               IsRunning="{Binding IsStocksLoading}"
+                                               IsVisible="{Binding IsStocksLoading}"
+                                               HeightRequest="20" WidthRequest="20" />
+                        </Grid>
+                        <Label Text="{Binding StocksError}"
+                               TextColor="#F44336"
+                               IsVisible="{Binding StocksError, Converter={StaticResource StringToBoolConverter}}"
+                               FontSize="12" />
+                        <ScrollView Orientation="Horizontal">
+                            <Grid ColumnDefinitions="280,280,280,280" ColumnSpacing="16">
+                                <Border Grid.Column="0"
+                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="12">
+                                    <VerticalStackLayout Spacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Border BackgroundColor="#DC143C"
+                                                    StrokeShape="RoundRectangle 4"
+                                                    Stroke="Transparent"
+                                                    WidthRequest="28" HeightRequest="20"
+                                                    VerticalOptions="Center">
+                                                <Grid RowDefinitions="*,*">
+                                                    <BoxView Grid.Row="0" BackgroundColor="White" />
+                                                    <BoxView Grid.Row="1" BackgroundColor="#DC143C" />
+                                                </Grid>
+                                            </Border>
+                                            <Label Text="Polska" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <BoxView HeightRequest="1"
+                                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}" />
+                                        <CollectionView ItemsSource="{Binding PolishStocks}"
+                                                        HeightRequest="{OnPlatform Android=300, Default=-1}">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="models:AssetPrice">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="8">
+                                                        <Border BackgroundColor="#DC143C"
+                                                                StrokeShape="RoundRectangle 16"
+                                                                Stroke="Transparent"
+                                                                WidthRequest="32" HeightRequest="32">
+                                                            <Label Text="{Binding Symbol, Converter={StaticResource StockSymbolConverter}}"
+                                                                   TextColor="White"
+                                                                   FontAttributes="Bold"
+                                                                   FontSize="8"
+                                                                   HorizontalOptions="Center"
+                                                                   VerticalOptions="Center" />
+                                                        </Border>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                            <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                            <Label Text="{Binding Symbol}" FontSize="10" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                        </VerticalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                                            <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Bold"
+                                                                   HorizontalOptions="End" />
+                                                            <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                                   FontSize="10"
+                                                                   HorizontalOptions="End"
+                                                                   TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </VerticalStackLayout>
+                                </Border>
+                                <Border Grid.Column="1"
+                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="12">
+                                    <VerticalStackLayout Spacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Image Source="flag_usa.png"
+                                                   WidthRequest="28"
+                                                   HeightRequest="20"
+                                                   Aspect="AspectFill"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="USA" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <BoxView HeightRequest="1"
+                                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}" />
+                                        <CollectionView ItemsSource="{Binding USStocks}"
+                                                        HeightRequest="{OnPlatform Android=300, Default=-1}">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="models:AssetPrice">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="8">
+                                                        <Border BackgroundColor="#3C3B6E"
+                                                                StrokeShape="RoundRectangle 16"
+                                                                Stroke="Transparent"
+                                                                WidthRequest="32" HeightRequest="32">
+                                                            <Label Text="{Binding Symbol, Converter={StaticResource StockSymbolConverter}}"
+                                                                   TextColor="White"
+                                                                   FontAttributes="Bold"
+                                                                   FontSize="8"
+                                                                   HorizontalOptions="Center"
+                                                                   VerticalOptions="Center" />
+                                                        </Border>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                            <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                            <Label Text="{Binding Symbol}" FontSize="10" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                        </VerticalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                                            <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Bold"
+                                                                   HorizontalOptions="End" />
+                                                            <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                                   FontSize="10"
+                                                                   HorizontalOptions="End"
+                                                                   TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </VerticalStackLayout>
+                                </Border>
+                                <Border Grid.Column="2"
+                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="12">
+                                    <VerticalStackLayout Spacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Image Source="flag_europe.webp"
+                                                   WidthRequest="28"
+                                                   HeightRequest="20"
+                                                   Aspect="AspectFill"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="Europa" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <BoxView HeightRequest="1"
+                                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}" />
+                                        <CollectionView ItemsSource="{Binding EuropeanStocks}"
+                                                        HeightRequest="{OnPlatform Android=300, Default=-1}">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="models:AssetPrice">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="8">
+                                                        <Border BackgroundColor="#003399"
+                                                                StrokeShape="RoundRectangle 16"
+                                                                Stroke="Transparent"
+                                                                WidthRequest="32" HeightRequest="32">
+                                                            <Label Text="{Binding Symbol, Converter={StaticResource StockSymbolConverter}}"
+                                                                   TextColor="White"
+                                                                   FontAttributes="Bold"
+                                                                   FontSize="8"
+                                                                   HorizontalOptions="Center"
+                                                                   VerticalOptions="Center" />
+                                                        </Border>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                            <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                            <Label Text="{Binding Symbol}" FontSize="10" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                        </VerticalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                                            <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Bold"
+                                                                   HorizontalOptions="End" />
+                                                            <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                                   FontSize="10"
+                                                                   HorizontalOptions="End"
+                                                                   TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </VerticalStackLayout>
+                                </Border>
+                                <Border Grid.Column="3"
+                                        BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="12">
+                                    <VerticalStackLayout Spacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="🌏" FontSize="20" />
+                                            <Label Text="Azja" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <BoxView HeightRequest="1"
+                                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}" />
+                                        <CollectionView ItemsSource="{Binding AsianStocks}"
+                                                        HeightRequest="{OnPlatform Android=300, Default=-1}">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="models:AssetPrice">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="8">
+                                                        <Border BackgroundColor="#C41E3A"
+                                                                StrokeShape="RoundRectangle 16"
+                                                                Stroke="Transparent"
+                                                                WidthRequest="32" HeightRequest="32">
+                                                            <Label Text="{Binding Symbol, Converter={StaticResource StockSymbolConverter}}"
+                                                                   TextColor="White"
+                                                                   FontAttributes="Bold"
+                                                                   FontSize="8"
+                                                                   HorizontalOptions="Center"
+                                                                   VerticalOptions="Center" />
+                                                        </Border>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                            <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                                            <Label Text="{Binding Symbol}" FontSize="10" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                                        </VerticalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                                            <Label Text="{Binding PricePln, StringFormat='{0:N2} PLN'}"
+                                                                   FontSize="11"
+                                                                   FontAttributes="Bold"
+                                                                   HorizontalOptions="End" />
+                                                            <Label Text="{Binding ChangePercent24h, StringFormat='{0:N2}%'}"
+                                                                   FontSize="10"
+                                                                   HorizontalOptions="End"
+                                                                   TextColor="{Binding ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+                        </ScrollView>
+                        <BoxView HeightRequest="1"
+                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                 Margin="0,8,0,8" />
+                        <Label Text="Szukaj firmy (Polska, US, Europa, Azja)" FontSize="14" FontAttributes="Bold" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Border BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                    Padding="12,8">
+                                <Entry Text="{Binding StockSearchQuery}"
+                                       Placeholder="Wpisz symbol (np. AAPL, MSFT, PKO.WA)"
+                                       FontSize="14" />
+                            </Border>
+                            <Button Grid.Column="1"
+                                    Text="Szukaj"
+                                    Command="{Binding SearchStockCommand}"
+                                    BackgroundColor="#40E0D0"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="8"
+                                    Padding="16,8" />
+                        </Grid>
+                        <ActivityIndicator IsRunning="{Binding IsStockSearching}"
+                                           IsVisible="{Binding IsStockSearching}"
+                                           HeightRequest="24" WidthRequest="24"
+                                           HorizontalOptions="Center" />
+                        <Border IsVisible="{Binding SearchedStock, Converter={StaticResource NullToBoolConverter}}"
+                                BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2D2D2D}"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                Padding="12">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border BackgroundColor="#4CAF50"
+                                            StrokeShape="RoundRectangle 20"
+                                            Stroke="Transparent"
+                                            WidthRequest="40" HeightRequest="40">
+                                        <Label Text="{Binding SearchedStock.Symbol, Converter={StaticResource StockSymbolConverter}}"
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               FontSize="10"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding SearchedStock.Name}" FontAttributes="Bold" />
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding SearchedStock.Symbol}" FontSize="12" TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                                            <Label Text="{Binding SearchedStock.Exchange}" FontSize="10" TextColor="{AppThemeBinding Light=#888888, Dark=#888888}" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                        <Label Text="{Binding SearchedStock.PricePln, StringFormat='{0:N2} PLN'}"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="End" />
+                                        <Label Text="{Binding SearchedStock.ChangePercent24h, StringFormat='{0:N2}%'}"
+                                               FontSize="12"
+                                               HorizontalOptions="End"
+                                               TextColor="{Binding SearchedStock.ChangePercent24h, Converter={StaticResource PnLColorConverter}}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="4">
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
+                                        <Label Text="Najwyższa cena (dziś):" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.HighPrice24h, StringFormat='{0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#4CAF50" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                        <Label Text="Najniższa cena (dziś):" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.LowPrice24h, StringFormat='{0:N2}'}" FontSize="11" FontAttributes="Bold" TextColor="#F44336" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="4">
+                                        <Label Text="Max 52 tyg.:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.FiftyTwoWeekHigh, StringFormat='{0:N2}'}" FontSize="11" TextColor="#4CAF50" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="4">
+                                        <Label Text="Min 52 tyg.:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.FiftyTwoWeekLow, StringFormat='{0:N2}'}" FontSize="11" TextColor="#F44336" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="4">
+                                        <Label Text="Wolumen:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.Volume24h, StringFormat='{0:N0}'}" FontSize="11" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Spacing="4">
+                                        <Label Text="Zmiana:" FontSize="11" TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}" />
+                                        <Label Text="{Binding SearchedStock.PriceChange24h, StringFormat='${0:N2}'}" FontSize="11"
+                                               TextColor="{Binding SearchedStock.PriceChange24h, Converter={StaticResource PnLColorConverter}}" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                                <BoxView HeightRequest="1"
+                                         BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                         Margin="0,4,0,4" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding SearchedStock.Name, StringFormat='Wykres: {0}'}"
+                                           FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="{Binding SearchedStockChartInterval, StringFormat='({0})'}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <ActivityIndicator IsRunning="{Binding IsSearchedStockChartLoading}"
+                                                   IsVisible="{Binding IsSearchedStockChartLoading}"
+                                                   HeightRequest="30" WidthRequest="30"
+                                                   HorizontalOptions="Center" />
+                                <ContentView>
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          RowDefinitions="*,Auto">
+                                        <Grid Grid.Column="0" Grid.Row="0"
+                                              RowDefinitions="Auto,*,Auto"
+                                              Margin="0,0,6,0">
+                                            <Label Grid.Row="0"
+                                                   Text="{Binding SearchedStockChartMaxPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Start" />
+                                            <Label Grid.Row="1"
+                                                   Text="{Binding SearchedStockChartMidPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Row="2"
+                                                   Text="{Binding SearchedStockChartMinPrice}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   VerticalOptions="End" />
+                                        </Grid>
+                                        <microcharts:ChartView Grid.Column="1" Grid.Row="0"
+                                                               Chart="{Binding SearchedStockChart}"
+                                                               HeightRequest="200"
+                                                               HorizontalOptions="Fill" />
+                                        <Grid Grid.Column="1" Grid.Row="1"
+                                              ColumnDefinitions="*,*,*"
+                                              Margin="0,4,0,0">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding SearchedChartStartDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Start" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding SearchedChartMidDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="Center" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding SearchedChartEndDate}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}"
+                                                   HorizontalOptions="End" />
+                                        </Grid>
+                                    </Grid>
+                                </ContentView>
+                                <HorizontalStackLayout Spacing="16"
+                                                       HorizontalOptions="Center"
+                                                       Margin="0,8,0,0">
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📈" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś Y: Cena"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="📅" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="Oś X: Data (dd.mm)"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                    <Button Text="24h"
+                                            Command="{Binding ChangeSearchedStockChartIntervalCommand}"
+                                            CommandParameter="24h"
+                                            BackgroundColor="{Binding SearchedStockChartInterval, Converter={StaticResource StockIntervalToColorConverter}, ConverterParameter=24h}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1tyd."
+                                            Command="{Binding ChangeSearchedStockChartIntervalCommand}"
+                                            CommandParameter="1tyd."
+                                            BackgroundColor="{Binding SearchedStockChartInterval, Converter={StaticResource StockIntervalToColorConverter}, ConverterParameter=1tyd.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1msc."
+                                            Command="{Binding ChangeSearchedStockChartIntervalCommand}"
+                                            CommandParameter="1msc."
+                                            BackgroundColor="{Binding SearchedStockChartInterval, Converter={StaticResource StockIntervalToColorConverter}, ConverterParameter=1msc.}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                    <Button Text="1rok"
+                                            Command="{Binding ChangeSearchedStockChartIntervalCommand}"
+                                            CommandParameter="1rok"
+                                            BackgroundColor="{Binding SearchedStockChartInterval, Converter={StaticResource StockIntervalToColorConverter}, ConverterParameter=1rok}"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            CornerRadius="4"
+                                            Padding="12,6"
+                                            HeightRequest="32" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>
