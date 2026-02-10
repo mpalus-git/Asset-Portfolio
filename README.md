@@ -130,9 +130,10 @@ Projekt wykorzystuje wzorzec **MVVM** (Model–View–ViewModel) z wyraźnym pod
 
 ## 🚀 Instalacja i uruchomienie
 
-1. Pobierz projekt w rozszerzeniu .zip.
-2. Wypakuj całą zawartość folderu.
-3. Otwórz `PortfelStudenta.csproj` bezpośrednio w **Visual Studio** i uruchom projekt przyciskiem ▶️ z wybraną platformą docelową.
+1. Pobierz projekt w formacie .zip z repozytorium GitHub.
+2. Wypakuj zawartość archiwum do wybranego folderu na dysku.
+3. Otwórz plik PortfelStudenta.csproj bezpośrednio w środowisku Visual Studio.
+4. Skompiluj i uruchom aplikację, korzystając z przycisku Start (▶️) na pasku narzędzi.
 
 ---
 
