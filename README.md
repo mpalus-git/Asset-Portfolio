@@ -195,7 +195,3 @@ PortfelStudenta/
 > **Uwaga:** Wszystkie ceny są automatycznie przeliczane na **PLN** za pomocą kursów z Narodowego Banku Polskiego.
 
 ---
-
-<p align="center">
-  Zbudowane z .NET MAUI
-</p>
