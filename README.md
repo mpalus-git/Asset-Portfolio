@@ -74,7 +74,7 @@ Zbudowana w **.NET MAUI** (.NET 10) - działa na **Android**, **iOS**, **macOS**
 
 ## 🏗️ Architektura
 
-Projekt wykorzystuje wzorzec **MVVM** (Model–View–ViewModel) z wyraźnym podziałem odpowiedzialności:
+Projekt wykorzystuje wzorzec **MVVM** (Model-View-ViewModel) z wyraźnym podziałem odpowiedzialności:
 
 ```
 ┌─────────────────────────────────────────┐
@@ -107,12 +107,12 @@ Projekt wykorzystuje wzorzec **MVVM** (Model–View–ViewModel) z wyraźnym pod
 
 | Kategoria | Technologia |
 |---|---|
-| Framework | [.NET MAUI](https://learn.microsoft.com/dotnet/maui/) (.NET 10) |
+| Framework | .NET MAUI (.NET 10) |
 | Język | C# 14 |
-| Wzorzec | MVVM — [CommunityToolkit.Mvvm](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/) |
-| UI Toolkit | [CommunityToolkit.Maui](https://learn.microsoft.com/dotnet/communitytoolkit/maui/) |
-| Baza danych | [SQLite](https://www.sqlite.org/) via `sqlite-net-pcl` |
-| Wykresy | [Microcharts](https://github.com/dotnet-ad/Microcharts) + SkiaSharp |
+| Wzorzec | MVVM - CommunityToolkit.Mvvm |
+| UI Toolkit | CommunityToolkit.Maui |
+| Baza danych | SQLite via `sqlite-net-pcl` |
+| Wykresy | Microcharts + SkiaSharp |
 | JSON | Newtonsoft.Json |
 | Nawigacja | .NET MAUI Shell (TabBar) |
 
@@ -120,11 +120,10 @@ Projekt wykorzystuje wzorzec **MVVM** (Model–View–ViewModel) z wyraźnym pod
 
 ## 📌 Wymagania
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- Visual Studio 2022 17.14+ z workloadem **.NET Multi-platform App UI**
+- .NET 10 SDK
+- Visual Studio 2022 17.14+ z workloadem .NET Multi-platform App UI
 - Dla Androida: Android SDK 21+ (Android 5.0)
 - Dla iOS / macOS: Xcode 15+, macOS 15+
-- Dla Windows: Windows 10 (17763+)
 
 ---
 
@@ -132,7 +131,7 @@ Projekt wykorzystuje wzorzec **MVVM** (Model–View–ViewModel) z wyraźnym pod
 
 1. Pobierz projekt w formacie .zip z repozytorium GitHub.
 2. Wypakuj zawartość archiwum do wybranego folderu na dysku.
-3. Otwórz plik PortfelStudenta.csproj bezpośrednio w środowisku Visual Studio.
+3. Otwórz plik **PortfelStudenta.csproj** bezpośrednio w środowisku Visual Studio.
 4. Skompiluj i uruchom aplikację, korzystając z przycisku Start (▶️) na pasku narzędzi.
 
 ---
@@ -151,7 +150,7 @@ PortfelStudenta/
 │   └── Transaction.cs           # Transakcja (tabela SQLite)
 ├── ViewModels/
 │   ├── BaseViewModel.cs         # Bazowy VM (IsBusy, Title)
-│   ├── DashboardViewModel.cs    # Dashboard — wykresy, P&L
+│   ├── DashboardViewModel.cs    # Dashboard - wykresy, P&L
 │   ├── MarketsViewModel.cs      # Notowania rynkowe
 │   ├── PortfolioViewModel.cs    # Lista pozycji
 │   ├── SettingsViewModel.cs     # CSV import/export, reset
@@ -167,7 +166,7 @@ PortfelStudenta/
 │   ├── CoinCapApiService.cs     # Kryptowaluty (Binance API)
 │   ├── NbpApiService.cs         # Kursy walut (NBP API)
 │   ├── YahooFinanceApiService.cs # Akcje (Yahoo Finance API)
-│   ├── DatabaseService.cs       # SQLite — transakcje + historia cen
+│   ├── DatabaseService.cs       # SQLite - transakcje + historia cen
 │   ├── PortfolioService.cs      # Logika portfela i kalkulacje
 │   ├── CsvService.cs            # Import / eksport CSV
 │   └── CacheService.cs          # Cache w pamięci operacyjnej
